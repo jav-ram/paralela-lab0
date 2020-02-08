@@ -33,6 +33,7 @@ void *parallel_max(void* data) {
 void parallel(vector<int> numbers) {
   int P = 8;
   int global_greater = 0;
+  int n = (int) N/P;
   pthread_t threads[P];
   struct thread_param td[P];
   void *tmp;
@@ -45,9 +46,11 @@ void parallel(vector<int> numbers) {
     td[p].n = n;
     int rc = pthread_create(&threads[p], NULL, parallel_max, (void *)& td[p]);
   }
+  for (int p = 0; p < P; p++) {
     s = pthread_join(threads[p], &tmp);
     local = (int) tmp;
     global_greater = max(global_greater, local);
+  }
   printf("mayor:\t%d\n", global_greater);
 }
 
@@ -67,19 +70,7 @@ int main() {
     numbers.push_back(rand() % 50000);
 
   clock_t start, end;
-
-  // start
-  start = clock();
-  // execute
-  // **********************************************************
-  printf("mayor: %d\n", serial_max(numbers, N));
-  // **********************************************************
-  // end
-  end = clock();
-  double time_taken = double(end - start)/double(CLOCKS_PER_SEC)*1000; 
-  cout << "Tiempo serial : " << fixed 
-        << time_taken << setprecision(5); 
-  cout << " ms " << endl; 
+  double time_taken;
 
   // start
   start = clock();

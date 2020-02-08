@@ -8,8 +8,7 @@
 #include <bits/stdc++.h> 
 #include <pthread.h>
 using namespace std::chrono;
-using namespace std; 
-int N = 10000;
+using namespace std;
 
 struct thread_param {
   int *list;
@@ -29,8 +28,8 @@ void *parallel_max(void* data) {
   return (void*)serial_max(my_data->list, my_data->n);
 }
 
-void parallel(vector<int> numbers) {
-  int P = 8;
+void parallel(vector<int> numbers, int N) {
+  int P = 4;
   int global_greater = 0;
   int n = (int) N/P;
   pthread_t threads[P];
@@ -56,39 +55,31 @@ int max(int a, int b) {
 }
 
 int main() {
-  vector<int> numbers;
-  srand (time(NULL));
-  
-  
-  for (int i=0; i<N; ++i)
-    numbers.push_back(rand() % 50000);
-
+  double time_taken;
   clock_t start, end;
+  for (int N = 1; N < 11; N +=1) {
+    vector<int> numbers;
+    srand (time(NULL));
 
-  // start
-  start = clock();
-  // execute
-  // **********************************************************
-  printf("mayor: %d\n", serial_max(&numbers[0], N));
-  // **********************************************************
-  // end
-  end = clock();
-  double time_taken = double(end - start)/double(CLOCKS_PER_SEC)*1000; 
-  cout << "Tiempo serial : " << fixed 
-        << time_taken << setprecision(5); 
-  cout << " ms " << endl; 
 
-  // start
-  start = clock();
-  // execute
-  // **********************************************************
-  parallel(numbers);
-  // **********************************************************
-  // end
-  end = clock();
-  time_taken = double(end - start)/double(CLOCKS_PER_SEC)*1000; 
-  cout << "Tiempo paralelo : " << fixed 
-        << time_taken << setprecision(5); 
-  cout << " ms " << endl; 
+    for (int i=0; i<N; ++i)
+      numbers.push_back(rand() % 50000);
+
+    printf("%d\n", numbers);
+
+    // start
+    start = clock();
+    // execute
+    // **********************************************************
+    parallel(numbers, N);
+    // **********************************************************
+    // end
+
+    end = clock();
+    time_taken = double(end - start)/double(CLOCKS_PER_SEC)*1000; 
+    cout << "Tiempo n = " << N <<": " << fixed 
+          << time_taken << setprecision(5); 
+    cout << " ms " << endl; 
+  }
   return 0;
 }
